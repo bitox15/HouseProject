@@ -7,4 +7,34 @@ from apps.users.api.serializers import UserSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
-    queryset = UserSerializer.Meta.model.objects.filter()
+    
+    
+    def get_queryset(self,pk=None):
+        if pk is None:
+            return self.get_serializer().Meta.model.objects.filter(is_active=True)
+        return self.get_serializer().Meta.model.objects.filter(id = pk, is_active = True).first()
+
+    
+    def list(self,request):
+        user_serializer = self.get_serializer(self.get_queryset(), many = True)
+        return Response(user_serializer.data, status = status.HTTP_200_OK)
+
+    
+    def create(self,request):
+        serializer = self.serializer_class(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'User Created'},status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+
+    
+    def destroy(self,request,pk=None):
+        user = self.get_queryset().filter(id=pk).first()
+        if user:
+            user.is_active = False
+            user.save()
+            return Response({'message': 'User Deleted'}, status = status.HTTP_200_OK)
+        return Response({'error': 'User does not exist'}, status = status.HTTP_400_BAD_REQUEST)
+
+    
