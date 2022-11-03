@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'simple_history',
     'apps.users',
     'apps.base',
+    
 ]
 
 

@@ -27,6 +27,14 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'message': 'User Created'},status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
+    
+    def update(self,request,pk=None):
+        if self.get_queryset(pk):
+            user_serializer = self.serializer_class(self.get_queryset(pk),data = request.data)
+            if user_serializer.is_valid():
+                user_serializer.save()
+                return Response(user_serializer.data,status = status.HTTP_200_OK)
+            return Response(user_serializer.errors,status = status.HTTP_400_BAD_REQUEST)
 
     
     def destroy(self,request,pk=None):
@@ -36,5 +44,7 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
             return Response({'message': 'User Deleted'}, status = status.HTTP_200_OK)
         return Response({'error': 'User does not exist'}, status = status.HTTP_400_BAD_REQUEST)
+
+    
 
     
