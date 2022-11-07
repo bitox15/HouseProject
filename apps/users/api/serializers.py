@@ -4,16 +4,18 @@ from apps.users.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id','username', 'password', 'email', 'name', 'last_name',]
+        fields = ['id','username', 'password', 'email', 'name', 'last_name', 'is_superuser']
         extra_kwargs = {'password': {'write_only': False}}
 
     def create(self, validated_data):
         user = User(
+        username=validated_data['username'],    
         email=validated_data['email'],
-        username=validated_data['username'],
         name = validated_data['name'],
         last_name = validated_data['last_name'],
         password = validated_data['password'],
+        is_superuser = validated_data['is_superuser']
+        
     )
         user.set_password(validated_data['password'])
         user.save()

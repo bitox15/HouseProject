@@ -1,10 +1,11 @@
 
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from simple_history.models import HistoricalRecords
 from apps.base.models import BaseModel
 
-class UserManager(BaseModel):
+
+class UserManager(BaseUserManager):
     def _create_user(self, username, email, name, last_name, password, is_staff, is_superuser, **extra_fields):
         user = self.model(
             username = username,
@@ -27,21 +28,24 @@ class UserManager(BaseModel):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length = 255, unique = True)
+    objects = UserManager()
+
+    username = models.CharField(max_length = 255, unique = True, blank= False, null=False)
     email = models.EmailField('Email', max_length = 255, unique = True)
     name = models.CharField('Name', max_length = 255, blank = True, null = True)
     last_name = models.CharField('Last Name', max_length = 255, blank = True, null = True)
-    image = models.ImageField('Profile Image ', upload_to ='profile/', max_length = 255, null = True, blank = True)
+    #image = models.ImageField('Profile Image ', upload_to ='profile/', max_length = 255, null = True, blank = True)
     is_active = models.BooleanField(default = True)
     is_staff = models.BooleanField(default = False)
+    is_superuser = models.BooleanField(default = False)
     historical = HistoricalRecords()
-    objects = UserManager()
-
+    
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 
     USERNAME_FIELD = 'username'
+
     REQUIRED_FIELDS = ['email', 'name', 'last_name']
 
     def natural_key(self):
@@ -49,3 +53,4 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.name} {self.last_name}'
+     
