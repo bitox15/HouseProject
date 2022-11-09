@@ -2,7 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from simple_history.models import HistoricalRecords
-from apps.base.models import BaseModel
+
 
 
 class UserManager(BaseUserManager):
@@ -29,8 +29,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
-
-    username = models.CharField(max_length = 255, unique = True, blank= False, null=False)
+    id = models.AutoField(primary_key = True)
+    username = models.CharField('username',max_length = 255, unique = True, blank= False, null=False)
     email = models.EmailField('Email', max_length = 255, unique = True)
     name = models.CharField('Name', max_length = 255, blank = True, null = True)
     last_name = models.CharField('Last Name', max_length = 255, blank = True, null = True)

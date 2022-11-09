@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'simple_history',
     'apps.users',
-    'apps.base',
+    'apps.housing',
+    
     
 ]
 

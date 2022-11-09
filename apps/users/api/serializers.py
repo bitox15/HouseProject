@@ -9,12 +9,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User(
-        username=validated_data['username'],    
-        email=validated_data['email'],
+        username = validated_data['username'],    
+        email = validated_data['email'],
         name = validated_data['name'],
         last_name = validated_data['last_name'],
-        password = validated_data['password'],
-        is_superuser = validated_data['is_superuser']
+        password = validated_data['password']
         
     )
         user.set_password(validated_data['password'])
