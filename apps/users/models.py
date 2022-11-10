@@ -28,7 +28,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    objects = UserManager()
+    
     id = models.AutoField(primary_key = True)
     username = models.CharField('username',max_length = 255, unique = True, blank= False, null=False)
     email = models.EmailField('Email', max_length = 255, unique = True)
@@ -39,7 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default = False)
     is_superuser = models.BooleanField(default = False)
     historical = HistoricalRecords()
-    
+    objects = UserManager()
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
