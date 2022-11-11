@@ -40,6 +40,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default = False)
     historical = HistoricalRecords()
     objects = UserManager()
+    
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'

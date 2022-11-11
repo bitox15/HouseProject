@@ -4,6 +4,11 @@ from rest_framework.response import Response
 
 from apps.housing.api.serializers import HousingSerializer
 
+
+
+
+
+
 class HousingViewSet(viewsets.ModelViewSet):
     serializer_class = HousingSerializer
     

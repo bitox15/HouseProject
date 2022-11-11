@@ -20,10 +20,11 @@ class Housing(BaseModel):
     phone_number = models.CharField(max_length = 55, blank = True, null = False)
     type = models.ForeignKey(TypeHousing, on_delete = models.CASCADE)
     description = models.TextField(max_length = 300, blank = True)
-    
-    
+    owner = models.ForeignKey(User, on_delete= models.CASCADE, null=True, blank=False)
+    price = models.IntegerField(blank=False, null=True)
     class Meta:
         verbose_name = 'Housing'
     
     def __str__(self):
-        return self.adress    
+        return f'{self.adress} - {self.owner}' 
+
