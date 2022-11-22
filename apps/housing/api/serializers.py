@@ -9,5 +9,5 @@ class HousingSerializer(serializers.ModelSerializer):
     class Meta:
        
         model = Housing
-        fields = ['id', 'adress', 'phone_number', 'type', 'description','owner', 'price']
+        fields = ['id', 'adress', 'department', 'phone_number', 'type', 'description','owner', 'price']
        
