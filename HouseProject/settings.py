@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'apps.housing',
     'apps.base',
     'apps.state',
+    'apps.city',
     
     
 ]
