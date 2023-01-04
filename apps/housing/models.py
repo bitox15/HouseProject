@@ -18,7 +18,7 @@ class TypeHousing(models.Model):
 
 class Housing(BaseModel):
     
-    adress = models.CharField(max_length = 255, unique = True, blank = False, null = False)
+    address = models.CharField(max_length = 255, unique = True, blank = False, null = False)
     department = models.ForeignKey(CityUbication, on_delete=models.CASCADE, blank=False, null=True)
     phone_number = models.CharField(max_length = 55, blank = True, null = False)
     type = models.ForeignKey(TypeHousing, on_delete = models.CASCADE, null=True)
@@ -29,5 +29,5 @@ class Housing(BaseModel):
         verbose_name = 'Housing'
     
     def __str__(self):
-        return f'{self.adress} - {self.owner}' 
+        return f'{self.address} - {self.owner}' 
 

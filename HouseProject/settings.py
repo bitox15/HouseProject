@@ -1,4 +1,10 @@
 from pathlib import Path
+from datetime import timedelta
+
+ADMIN_URL = 'admin'
+API_URL = 'api'
+
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,13 +39,38 @@ INSTALLED_APPS = [
     'apps.base',
     'apps.state',
     'apps.city',
-    
+    'apps.authentication',
     
 ]
 
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'apps.authentication.authentication.SafeJWTAuthentication',
+    ),
+    'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
+    'DATE_INPUT_FORMATS': ["Y-%m-%d %H:%M:%S"],
+}
 
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=14),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('JWT','Bearer'),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+}
 
 
 MIDDLEWARE = [
@@ -51,6 +82,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+
+     # CORS
+    'corsheaders.middleware.CorsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'HouseProject.urls'
@@ -127,3 +162,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+

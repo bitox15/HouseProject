@@ -6,13 +6,7 @@ class CityUbicationSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = CityUbication
-        fields = ['name','state']
+        fields = '__all__'
 
-    def to_representation(self, instance):
-        return {
-            'name': instance.name,
-            'state': instance.state.name
 
-        }
-            
         
