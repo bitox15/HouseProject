@@ -41,6 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     historical = HistoricalRecords()
     objects = UserManager()
     
+   
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'

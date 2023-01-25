@@ -23,8 +23,7 @@ def get_filter(filters):
     return city
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
+
 def get(request, pk):
     city = get_object_or_404(CityUbication, pk = pk)
     if city is not None:
@@ -32,16 +31,14 @@ def get(request, pk):
         return Response(city_serializer.data, status = status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
+
 def list(request):
     cities = get_filter(request.data)
     city_serializer = CityUbicationSerializer(cities, many = True)
     return Response(city_serializer.data, status = status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])   
+ 
 def create(request):
     city_serializer = CityUbicationSerializer(data = request.data)
     if city_serializer.is_valid():
@@ -50,8 +47,7 @@ def create(request):
     return Response(city_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])    
+    
 def update(request,pk=None):
     city = get_object_or_404(CityUbication, pk = pk, is_active= True)
     if city:
@@ -62,8 +58,7 @@ def update(request,pk=None):
         return Response(city_serializer.errors,status = status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])   
+
 def destroy(request,pk=None):
     city = get_object_or_404(CityUbication, pk = pk, is_active = True)
     if city:
@@ -71,3 +66,33 @@ def destroy(request,pk=None):
         city.save()
         return Response({'message': 'City Deleted'}, status = status.HTTP_200_OK)
     return Response({'error': 'User does not exist'}, status = status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def request_without_pk(request):
+    
+    if request.method == 'POST':
+        return create(request)
+    
+    if request.method == 'GET':
+        return list(request)
+
+    return Response('Method not allowed', status = status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'DELETE', 'PUT'])
+@permission_classes([IsAuthenticated])
+def request_with_pk(request, pk=None):
+
+    if request.method == 'DELETE':
+       return destroy(request,pk)
+
+    if request.method == 'PUT':
+        return update(request,pk)
+
+    if request.method == 'GET':
+        return get(request, pk)
+
+    return Response('Method not allowed', status = status.HTTP_400_BAD_REQUEST)

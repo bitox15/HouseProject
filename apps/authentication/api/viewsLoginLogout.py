@@ -3,13 +3,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.response import Response
 from rest_framework import status
 from apps.users.api.serializers import UserSerializer
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth import get_user_model
-
-
+from apps.users.models import User
+from rest_framework_simplejwt.tokens import RefreshToken
 
 import datetime
 import jwt
@@ -17,6 +18,7 @@ from django.conf import settings
 
 
 @api_view(['POST'])
+
 @permission_classes([AllowAny])
 @ensure_csrf_cookie
 def login(request):
@@ -50,3 +52,7 @@ def login(request):
 	response = serializer.data
 	response['token'] = access_token
 	return Response(response, status=status.HTTP_200_OK)
+
+
+
+

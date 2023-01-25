@@ -24,8 +24,7 @@ def get_filter(filters):
     return housing
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
+
 def get(request, pk):
     housing = get_object_or_404(Housing, pk = pk)
     if housing is not None:
@@ -41,16 +40,14 @@ def get_queryset(pk=None):
     return housing_serializer.Meta.model.objects.filter(id = pk, state = True).first()
 
     
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
+
 def list(request):
     housing = get_filter(request.data)
     housing_serializer = HousingSerializer(housing, many = True)
     return Response(housing_serializer.data, status = status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])   
+ 
 def create(request):
     serializer = HousingSerializer(data = request.data)
     if serializer.is_valid():
@@ -59,8 +56,7 @@ def create(request):
     return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])   
+  
 def update(request,pk=None):
     housing = get_object_or_404(Housing, pk = pk, is_active = True)
     if housing:
@@ -71,8 +67,7 @@ def update(request,pk=None):
         return Response(housing_serializer.errors,status = status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])    
+
 def destroy(request,pk=None):
     housing = get_object_or_404(Housing, pk = pk, is_active = True)
     if housing:
@@ -83,3 +78,30 @@ def destroy(request,pk=None):
 
     
 
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def request_without_pk(request):
+    
+    if request.method == 'POST':
+        return create(request)
+    
+    if request.method == 'GET':
+        return list(request)
+
+    return Response('Method not allowed', status = status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'DELETE', 'PUT'])
+@permission_classes([IsAuthenticated])
+def request_with_pk(request, pk=None):
+
+    if request.method == 'DELETE':
+       return destroy(request,pk)
+
+    if request.method == 'PUT':
+        return update(request,pk)
+
+    if request.method == 'GET':
+        return get(request, pk)
+
+    return Response('Method not allowed', status = status.HTTP_400_BAD_REQUEST)
