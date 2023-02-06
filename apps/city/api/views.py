@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-
+from rest_framework.pagination import PageNumberPagination
 
 
 def get_queryset(pk=None):
@@ -32,10 +32,15 @@ def get(request, pk):
 
 
 
-def list(request):
-    cities = get_filter(request.data)
-    city_serializer = CityUbicationSerializer(cities, many = True)
-    return Response(city_serializer.data, status = status.HTTP_200_OK)
+class HousingPagination(PageNumberPagination):
+    page_size = 10
+
+def pagination_list(request):
+    query = CityUbication.objects.all()
+    paginator = HousingPagination()
+    result_page = paginator.paginate_queryset(query, request)
+    serializer = CityUbicationSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
 
 
  
@@ -77,7 +82,7 @@ def request_without_pk(request):
         return create(request)
     
     if request.method == 'GET':
-        return list(request)
+        return pagination_list(request)
 
     return Response('Method not allowed', status = status.HTTP_400_BAD_REQUEST)
 

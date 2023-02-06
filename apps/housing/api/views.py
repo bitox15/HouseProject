@@ -6,10 +6,9 @@ from apps.housing.api.serializers import HousingSerializer
 from apps.housing.models import Housing
 from django.shortcuts import get_object_or_404
 
-
-
-
-
+from django.core.paginator import Paginator
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
 
 
 def get_filter(filters):
@@ -32,6 +31,7 @@ def get(request, pk):
         return Response(housing_serializer.data, status = status.HTTP_200_OK)
     
 
+
 def get_queryset(pk=None):
     housing = get_object_or_404(Housing)
     housing_serializer = HousingSerializer(housing, many = True)
@@ -39,15 +39,20 @@ def get_queryset(pk=None):
         return housing_serializer.Meta.model.objects.filter(state=True)
     return housing_serializer.Meta.model.objects.filter(id = pk, state = True).first()
 
-    
-
-def list(request):
-    housing = get_filter(request.data)
-    housing_serializer = HousingSerializer(housing, many = True)
-    return Response(housing_serializer.data, status = status.HTTP_200_OK)
 
 
+class HousingPagination(PageNumberPagination):
+    page_size = 10
+
+def pagination_list(request):
+    query = Housing.objects.all()
+    paginator = HousingPagination()
+    result_page = paginator.paginate_queryset(query, request)
+    serializer = HousingSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
  
+
+    
 def create(request):
     serializer = HousingSerializer(data = request.data)
     if serializer.is_valid():
@@ -76,7 +81,8 @@ def destroy(request,pk=None):
         return Response({'message': 'Housing Deleted'}, status = status.HTTP_200_OK)
     return Response({'error': 'Housing does not exist'}, status = status.HTTP_400_BAD_REQUEST)
 
-    
+
+
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -86,7 +92,7 @@ def request_without_pk(request):
         return create(request)
     
     if request.method == 'GET':
-        return list(request)
+        return pagination_list(request)
 
     return Response('Method not allowed', status = status.HTTP_400_BAD_REQUEST)
 
@@ -105,3 +111,10 @@ def request_with_pk(request, pk=None):
         return get(request, pk)
 
     return Response('Method not allowed', status = status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+

@@ -4,14 +4,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import AllowAny
-
-
-
+from rest_framework.pagination import PageNumberPagination
 from apps.users.api.serializers import UserSerializer
 
 
-serializer_class = UserSerializer
+
 
 def get_filter(filters):
 
@@ -27,17 +24,26 @@ def get_filter(filters):
     return users
     
     
+    
 def get_queryset(pk=None):
+    user = get_object_or_404(User)
+    user_serializer = user_serializer(user, many = True)
     if pk is None:
-        return serializer_class.Meta.model.objects.filter(is_active=True)
-    return serializer_class.Meta.model.objects.filter(id = pk, is_active = True).first()
+        return user_serializer.Meta.model.objects.filter(state=True)
+    return user_serializer.Meta.model.objects.filter(id = pk, state = True).first()
 
 
 
-def list(request):
-    users = get_filter(request.data)
-    user_serializer = UserSerializer(users, many = True)
-    return Response(user_serializer.data, status = status.HTTP_200_OK)
+class HousingPagination(PageNumberPagination):
+    page_size = 10
+
+def pagination_list(request):
+    query = User.objects.all()
+    paginator = HousingPagination()
+    result_page = paginator.paginate_queryset(query, request)
+    serializer = UserSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
+
 
 
 def get(request, pk):
@@ -48,12 +54,14 @@ def get(request, pk):
     return Response('user not found', status = status.HTTP_412_PRECONDITION_FAILED)
 
   
+
 def create(request):
     serializer = UserSerializer(data = request.data)
     if serializer.is_valid():
         serializer.save()
         return Response({'message': 'User Created'},status = status.HTTP_201_CREATED)
     return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
 
  
 def update(request,pk=None):
@@ -64,6 +72,7 @@ def update(request,pk=None):
             user_serializer.save()
             return Response(user_serializer.data,status = status.HTTP_200_OK)
         return Response(user_serializer.errors,status = status.HTTP_400_BAD_REQUEST)
+
 
 
 def destroy(request,pk=None):
@@ -84,7 +93,7 @@ def request_without_pk(request):
         return create(request)
     
     if request.method == 'GET':
-        return list(request)
+        return pagination_list(request)
 
     return Response('Method not allowed', status = status.HTTP_400_BAD_REQUEST)
 
